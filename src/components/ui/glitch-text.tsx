@@ -66,13 +66,21 @@ export function GlitchText({
 
   return (
     <AnyTag
-      className={cn("relative inline-block cursor-default select-none", className)}
+      className={cn("relative inline-block cursor-default select-none whitespace-nowrap", className)}
       onMouseEnter={triggerGlitch}
       data-text={text}
     >
-      <span className="relative z-10">{displayText}</span>
+      {/* Spacer: testo originale occupa lo spazio fisso, non cambia mai */}
+      <span style={{ opacity: 0 }} aria-hidden="true">{text}</span>
+
+      {/* Testo principale glitchato */}
+      <span className="absolute top-0 left-0 z-10 w-full h-full" aria-live="off">
+        {displayText}
+      </span>
+
+      {/* Layer glitch 1 — offset negativo */}
       <span
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="absolute top-0 left-0 z-0 w-full h-full pointer-events-none"
         aria-hidden="true"
         style={{
           color: glitchColor,
@@ -83,8 +91,10 @@ export function GlitchText({
       >
         {displayText}
       </span>
+
+      {/* Layer glitch 2 — offset positivo */}
       <span
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="absolute top-0 left-0 z-0 w-full h-full pointer-events-none"
         aria-hidden="true"
         style={{
           color: "rgba(255,255,255,0.15)",

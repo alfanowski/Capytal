@@ -4,7 +4,7 @@ import { CybersecSection } from "@/components/sections/CybersecSection";
 import { FooterSection } from "@/components/sections/FooterSection";
 
 export const metadata: Metadata = {
-  title: "Cybersecurity — Capytal Studio",
+  title: "Cybersecurity — Capytal Tech",
   description: "Penetration testing, vulnerability assessment e hardening. Identifichiamo le falle prima che lo facciano gli attaccanti.",
 };
 

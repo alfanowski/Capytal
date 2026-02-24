@@ -21,7 +21,7 @@ const pages = [
     icon: User,
     label: "Chi siamo",
     href: "/about",
-    description: "Il profilo di Capytal Studio e il metodo di lavoro.",
+    description: "Il profilo di Capytal Tech e il metodo di lavoro.",
   },
   {
     icon: Mail,
@@ -38,7 +38,7 @@ export function HomePreviewStrip() {
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(139,92,246,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.03) 1px, transparent 1px)",
+            "linear-gradient(rgba(139,92,246,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.045) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }}
       />
@@ -51,7 +51,7 @@ export function HomePreviewStrip() {
         >
           // Esplora il sito
         </motion.p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-zinc-900">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/5">
           {pages.map((item, i) => (
             <motion.div
               key={item.href}

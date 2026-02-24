@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowDown, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ParticlesBackground, FloatingOrbs } from "@/components/ui/animated-background";
+import { ParticlesBackground } from "@/components/ui/animated-background";
 import { GlitchText } from "@/components/ui/glitch-text";
 
 export function HeroSection() {
@@ -14,16 +14,10 @@ export function HeroSection() {
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black"
     >
       <ParticlesBackground />
-      <FloatingOrbs />
 
-      {/* Radial glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 50% at 50% 40%, rgba(88,28,135,0.3) 0%, transparent 70%)",
-        }}
-      />
+      {/* Radial violet overlay */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse at center, rgba(109,40,217,0.08) 0%, transparent 70%)" }} />
 
       {/* Corner decorations */}
       <div className="absolute top-24 left-8 w-16 h-16 border-l-2 border-t-2 border-purple-700/30 pointer-events-none" />
@@ -45,7 +39,7 @@ export function HeroSection() {
         >
           <span className="inline-flex items-center gap-2 border border-purple-700/50 bg-purple-950/30 text-purple-300 font-mono text-xs px-4 py-1.5 rounded-full tracking-widest uppercase backdrop-blur-sm">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-            Web Dev &amp; Cybersecurity Studio
+            Web Dev &amp; Cybersecurity Tech
           </span>
         </motion.div>
 
@@ -61,7 +55,7 @@ export function HeroSection() {
             className="text-[clamp(4rem,16vw,10rem)] font-black font-mono tracking-tighter text-white leading-none block"
           />
           <GlitchText
-            text="STUDIO"
+            text="TECH"
             as="h1"
             className="text-[clamp(1.5rem,6vw,3.5rem)] font-black font-mono tracking-[0.35em] text-purple-400 leading-none block mt-1"
           />

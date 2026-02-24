@@ -4,7 +4,7 @@ import { ContactSection } from "@/components/sections/ContactSection";
 import { FooterSection } from "@/components/sections/FooterSection";
 
 export const metadata: Metadata = {
-  title: "Contatti — Capytal Studio",
+  title: "Contatti — Capytal Tech",
   description: "Hai un progetto? Parliamone. Risposta garantita entro 24 ore.",
 };
 

@@ -4,8 +4,8 @@ import { AboutSection } from "@/components/sections/AboutSection";
 import { FooterSection } from "@/components/sections/FooterSection";
 
 export const metadata: Metadata = {
-  title: "Chi siamo — Capytal Studio",
-  description: "Capytal Studio: sviluppo web e cybersecurity con approccio diretto, codice pulito e zero compromessi sulla sicurezza.",
+  title: "Chi siamo — Capytal Tech",
+  description: "Capytal Tech: sviluppo web e cybersecurity con approccio diretto, codice pulito e zero compromessi sulla sicurezza.",
 };
 
 export default function AboutPage() {

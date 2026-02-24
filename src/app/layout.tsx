@@ -13,15 +13,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Capytal — Full Stack & Cybersecurity",
+  title: "Capytal Tech — Full Stack & Cybersecurity",
   description:
-    "Capytal è lo studio di sviluppo web full stack e cybersecurity di Andrea Alfano (alfanowski). Build what matters. Secure what's critical.",
+    "Capytal Tech è il team di sviluppo web full stack e cybersecurity di Andrea Alfano (alfanowski). Build what matters. Secure what's critical.",
   keywords: ["full stack", "cybersecurity", "web development", "next.js", "react", "hacking etico"],
   authors: [{ name: "Andrea Alfano", url: "https://github.com/alfanowski" }],
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
   openGraph: {
-    title: "Capytal — Full Stack & Cybersecurity",
+    title: "Capytal Tech — Full Stack & Cybersecurity",
     description: "Build what matters. Secure what's critical.",
     type: "website",
+    images: [{ url: "/logo.png" }],
   },
 };
 

@@ -4,7 +4,7 @@ import { ServiziSection } from "@/components/sections/ServiziSection";
 import { FooterSection } from "@/components/sections/FooterSection";
 
 export const metadata: Metadata = {
-  title: "Servizi — Capytal Studio",
+  title: "Servizi — Capytal Tech",
   description: "Sviluppo web full stack e cybersecurity auditing. Soluzioni su misura per chi non accetta compromessi.",
 };
 

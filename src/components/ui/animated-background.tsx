@@ -1,21 +1,29 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
 
 interface Particle {
   x: number;
   y: number;
   vx: number;
   vy: number;
-  radius: number;
+  size: number;
   opacity: number;
-  pulse: number;
-  pulseSpeed: number;
+  color: string;
+  life: number;
+  maxLife: number;
 }
 
+/**
+ * ParticlesBackground — stile alfa-s-industries adattato alla palette viola.
+ * Canvas con: griglia sottile, scan line, particelle con life cycle,
+ * connessioni tra particelle vicine, repulsione dal mouse.
+ */
 export function ParticlesBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  const animFrameRef = useRef<number>(0);
+  const mouseRef = useRef({ x: -9999, y: -9999 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -23,10 +31,7 @@ export function ParticlesBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animId: number;
-    const particles: Particle[] = [];
-    const COUNT = 110;
-    const MAX_DIST = 160;
+    const colors = ["#a78bfa", "#8b5cf6", "#c4b5fd", "#ffffff", "#7c3aed66"];
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -35,70 +40,119 @@ export function ParticlesBackground() {
     resize();
     window.addEventListener("resize", resize);
 
-    for (let i = 0; i < COUNT; i++) {
-      particles.push({
-        x: Math.random() * (canvas.width || 1200),
-        y: Math.random() * (canvas.height || 800),
-        vx: (Math.random() - 0.5) * 1.1,
-        vy: (Math.random() - 0.5) * 1.1,
-        radius: Math.random() * 2 + 0.5,
-        opacity: Math.random() * 0.6 + 0.2,
-        pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.02 + Math.random() * 0.03,
-      });
+    const createParticle = (x?: number, y?: number): Particle => {
+      const cx = x ?? Math.random() * canvas.width;
+      const cy = y ?? Math.random() * canvas.height;
+      return {
+        x: cx,
+        y: cy,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6 - 0.15,
+        size: Math.random() * 2 + 0.4,
+        opacity: Math.random() * 0.65 + 0.2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 0,
+        maxLife: Math.random() * 300 + 150,
+      };
+    };
+
+    for (let i = 0; i < 120; i++) {
+      particlesRef.current.push(createParticle());
     }
+
+    const onMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+      if (Math.random() > 0.75) {
+        particlesRef.current.push(
+          createParticle(
+            e.clientX + (Math.random() - 0.5) * 30,
+            e.clientY + (Math.random() - 0.5) * 30
+          )
+        );
+      }
+    };
+    window.addEventListener("mousemove", onMouseMove);
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < MAX_DIST) {
-            const alpha = (1 - dist / MAX_DIST) * 0.35;
+      // Grid
+      ctx.strokeStyle = "rgba(139, 92, 246, 0.045)";
+      ctx.lineWidth = 1;
+      const gridSize = 70;
+      for (let x = 0; x < canvas.width; x += gridSize) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += gridSize) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+      }
+
+      // Scan line
+      const scanY = ((Date.now() / 6000) % 1) * canvas.height;
+      const grad = ctx.createLinearGradient(0, scanY - 40, 0, scanY + 40);
+      grad.addColorStop(0, "rgba(139,92,246,0)");
+      grad.addColorStop(0.5, "rgba(139,92,246,0.05)");
+      grad.addColorStop(1, "rgba(139,92,246,0)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, scanY - 40, canvas.width, 80);
+
+      // Particles
+      particlesRef.current = particlesRef.current.filter((p) => p.life < p.maxLife);
+
+      for (const p of particlesRef.current) {
+        p.life++;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Mouse repulsion
+        const dx = p.x - mouseRef.current.x;
+        const dy = p.y - mouseRef.current.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 90) {
+          p.vx += (dx / dist) * 0.12;
+          p.vy += (dy / dist) * 0.12;
+        }
+
+        const lifeRatio = p.life / p.maxLife;
+        const alpha = p.opacity * (1 - Math.pow(lifeRatio, 2));
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color.includes("66")
+          ? p.color
+          : p.color + Math.floor(alpha * 255).toString(16).padStart(2, "0");
+        ctx.fill();
+
+        // Connections
+        for (const p2 of particlesRef.current) {
+          if (p === p2) continue;
+          const dx2 = p.x - p2.x;
+          const dy2 = p.y - p2.y;
+          const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+          if (dist2 < 110) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
-            ctx.lineWidth = 0.7;
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(139,92,246,${0.12 * (1 - dist2 / 110) * alpha})`;
+            ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         }
       }
 
-      for (const p of particles) {
-        p.pulse += p.pulseSpeed;
-        const glowRadius = p.radius + Math.sin(p.pulse) * 1.2;
-        const dynOpacity = p.opacity * (0.75 + 0.25 * Math.sin(p.pulse));
-
-        const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius * 4);
-        grd.addColorStop(0, `rgba(167,139,250,${dynOpacity * 0.5})`);
-        grd.addColorStop(1, "rgba(167,139,250,0)");
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, glowRadius * 4, 0, Math.PI * 2);
-        ctx.fillStyle = grd;
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, glowRadius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(192, 162, 255, ${dynOpacity})`;
-        ctx.fill();
-
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      while (particlesRef.current.length < 120) {
+        particlesRef.current.push(createParticle());
       }
 
-      animId = requestAnimationFrame(draw);
+      animFrameRef.current = requestAnimationFrame(draw);
     };
 
     draw();
+
     return () => {
-      cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", onMouseMove);
+      cancelAnimationFrame(animFrameRef.current);
     };
   }, []);
 
@@ -106,62 +160,20 @@ export function ParticlesBackground() {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ opacity: 0.75 }}
+      aria-hidden="true"
     />
   );
 }
 
-// Floating purple orbs — animated nebula effect for Hero
-export function FloatingOrbs() {
-  const orbs = [
-    { size: 500, x: "20%", y: "30%", duration: 18, delay: 0 },
-    { size: 350, x: "75%", y: "60%", duration: 22, delay: 3 },
-    { size: 280, x: "50%", y: "80%", duration: 15, delay: 6 },
-    { size: 200, x: "85%", y: "15%", duration: 20, delay: 2 },
-  ];
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {orbs.map((orb, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full"
-          style={{
-            width: orb.size,
-            height: orb.size,
-            left: orb.x,
-            top: orb.y,
-            transform: "translate(-50%, -50%)",
-            background:
-              "radial-gradient(circle, rgba(109,40,217,0.18) 0%, rgba(88,28,135,0.08) 50%, transparent 70%)",
-            filter: "blur(40px)",
-          }}
-          animate={{
-            x: [0, 30, -20, 10, 0],
-            y: [0, -25, 15, -10, 0],
-            scale: [1, 1.12, 0.95, 1.05, 1],
-            opacity: [0.6, 0.9, 0.6, 0.85, 0.6],
-          }}
-          transition={{
-            duration: orb.duration,
-            delay: orb.delay,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
+/** GridBackground — usato nelle hero delle pagine interne */
 export function GridBackground() {
   return (
     <div
       className="absolute inset-0 pointer-events-none"
       style={{
         backgroundImage: `
-          linear-gradient(rgba(139, 92, 246, 0.06) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(139, 92, 246, 0.06) 1px, transparent 1px)
+          linear-gradient(rgba(139,92,246,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(139,92,246,0.05) 1px, transparent 1px)
         `,
         backgroundSize: "60px 60px",
         maskImage:
