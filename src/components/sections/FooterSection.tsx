@@ -2,10 +2,11 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Github, Linkedin, Mail, ArrowUpRight } from "lucide-react";
+import { Github, Mail, ArrowUpRight } from "lucide-react";
 import { CONTACT_EMAIL, SOCIAL_LINKS } from "@/lib/constants";
+import React from "react";
 
-const ICON_MAP: Record<string, React.ElementType> = { Github, Linkedin, Mail };
+const ICON_MAP: Record<string, React.ElementType> = { Github, Mail };
 
 const navColumns = [
   {
@@ -29,7 +30,6 @@ const navColumns = [
     links: [
       { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}`, external: true },
       { label: "github.com/alfanowski", href: "https://github.com/alfanowski", external: true },
-      { label: "linkedin.com/in/alfanowski", href: "https://linkedin.com/in/alfanowski", external: true },
     ],
   },
 ];
